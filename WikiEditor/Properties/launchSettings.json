@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WikiEditor": {
+      "commandName": "Project",
+      "commandLineArgs": "\"D:\\Shared\\Dropbox\\Bücher\\Beide\\DdPdA\\Wiki\\Wiki.json\""
+    }
+  }
+}

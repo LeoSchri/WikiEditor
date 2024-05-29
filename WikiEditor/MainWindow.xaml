@@ -1,0 +1,109 @@
+﻿<Window x:Class="WikiEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:WikiEditor"
+        mc:Ignorable="d"
+        Title="Wiki Editor" WindowState="Maximized"
+        KeyDown="Window_KeyDown"
+        FontFamily="Book Antiqua">
+    <DockPanel LastChildFill="True" Margin="10">
+        <DockPanel DockPanel.Dock="Top" LastChildFill="True">
+            <Button Name="BTN_ReloadTemplate" Content="Template neu laden" HorizontalAlignment="Right" Width="300" Click="BTN_ReloadTemplate_Click" DockPanel.Dock="Right"/>
+            <Button Name="BTN_SaveAll" Content="Speichern" HorizontalAlignment="Right" Width="300" Click="BTN_SaveAll_Click" DockPanel.Dock="Right"/>
+            <TextBlock FontSize="16" Foreground="Gray" TextWrapping="Wrap" Width ="300" Margin="10" TextAlignment="Center" Text="Drücke Strg+L um einen Link einzufügen. Der selektierte Text wird zum Linkinhalt." HorizontalAlignment="Center" VerticalAlignment="Center" DockPanel.Dock="Right"/>
+            <TextBlock FontSize="16" Foreground="Gray" TextWrapping="Wrap" Width ="300" Margin="10" TextAlignment="Center" Text="Drücke Strg+I um den selektieren Text in Italic umzuwandeln." HorizontalAlignment="Center" VerticalAlignment="Center" DockPanel.Dock="Right"/>
+            <Label Name="LB_WikiName" FontSize="32" HorizontalAlignment="Left"/>
+        </DockPanel>
+        <StackPanel DockPanel.Dock="Left" Background="LightGray" Margin="0,20,0,0">
+            <StackPanel Margin="20">
+                <Label Content="Inhaltsverzeichnis" FontSize="24" Margin="0,10,0,0"/>
+                <ScrollViewer MaxHeight="500" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Name="TableOfContents_Stack"/>
+                </ScrollViewer>
+                <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                    <TextBox Name="TB_NewEntry" Width="100"/>
+                    <ComboBox Name="CB_NewEntry_Tag" Width="100" DisplayMemberPath="Name"/>
+                    <Button Name="BTN_Add_Entry" Content="Hinzufügen" Width="100" Click="BTN_Add_Entry_Click"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Name="Tags_Stack" Margin="20">
+                <DockPanel LastChildFill="True">
+                    <Button Name="BTN_Delete_Tag" Content="Löschen" Width="100" Height="30" IsEnabled="False" Click="BTN_Delete_Tag_Click" DockPanel.Dock="Right"/>
+                    <Label Content="Tags" FontSize="24"/>
+                </DockPanel>
+                <ScrollViewer MaxHeight="300" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <DataGrid Name="Tag_Data" SelectionMode="Extended" SelectionChanged="Tag_Data_SelectionChanged"/>
+                </ScrollViewer>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBox Name="TB_NewTag" Width="100"/>
+                    <xctk:ColorPicker Name="CP_NewTag" Width="100"/>
+                    <Button Name="BTN_Add_Tag" Content="Hinzufügen" Width="100" Click="BTN_Add_Tag_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Right" MinWidth="300" Background="LightGray" Margin="0,20,0,0">
+            <StackPanel Margin="20,20,20,10">
+                <Label Content="Navigation" FontSize="24" Margin="0,10,0,0"/>
+                <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+                    <StackPanel Name="Navigations_Stack"/>
+                </ScrollViewer>
+            </StackPanel>
+            <StackPanel Margin="20,20,20,10">
+                <Label Content="Tags" FontSize="24" Margin="0,10,0,0"/>
+                <ScrollViewer MaxHeight="150" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+                    <ItemsControl Name="Tags">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel LastChildFill="True" Margin="5">
+                                    <Button Name="BTN_DeleteTag" Content="Löschen" ToolTip="{Binding Name}" Width="100" Click="BTN_DeleteTag_Click" DockPanel.Dock="Right"/>
+                                    <Ellipse Height="15" Width="15" Fill="Black" DockPanel.Dock="Left"/>
+                                    <Label Content="{Binding Name}" DockPanel.Dock="Left"/>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <ComboBox Name="CB_AssignTag" Width="200" DisplayMemberPath="Name"/>
+                    <Button Name="BTN_AssignTag" Content="Zuweisen" Click="BTN_AssignTag_Click" Width="100"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Margin="20,10,20,20">
+                <Label Content="Links" FontSize="24"/>
+                <ScrollViewer MaxHeight="150" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+                    <ItemsControl Name="Links">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel LastChildFill="True" Margin="5">
+                                    <Button Name="BTN_Open_Link" Content="Öffnen" ToolTip="{Binding EntryName}" Width="100" Margin="10,0,0,0" Click="BTN_OpenLink_Click" DockPanel.Dock="Right"/>
+                                    <TextBlock Text="{Binding EntryName}" TextWrapping="Wrap" MaxWidth="200" DockPanel.Dock="Left"/>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+                <Label Content="Ungelöste Links" FontSize="24" Margin="0,10,0,0"/>
+                <ScrollViewer MaxHeight="100" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+                    <ItemsControl Name="LinksMissing">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBox Background="Transparent" BorderThickness="0" Text="{Binding EntryName}" IsReadOnly="True" TextWrapping="Wrap" MaxWidth="300" Margin="5"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Background="WhiteSmoke" Margin="0,20,0,0">
+            <Label Name="LB_Entry" Content="Inhalt" FontSize="24" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+            <TextBox Name="TB_Content" Height="800" Width="800" AllowDrop="True" AcceptsReturn="True" AcceptsTab="True" FontSize="12" ScrollViewer.CanContentScroll="True" Margin="10" TextWrapping="Wrap" Padding="50"/>
+            <DockPanel Margin="10" HorizontalAlignment="Center" Width="800">
+                <Label Name="LB_EntryCreated" FontSize="14" Foreground="Gray" DockPanel.Dock="Left"/>
+                <Label Name="LB_EntryModified" FontSize="14" Foreground="Gray" HorizontalAlignment="Right" HorizontalContentAlignment="Right" DockPanel.Dock="Right"/>
+            </DockPanel>
+        </StackPanel>
+    </DockPanel>
+</Window>
